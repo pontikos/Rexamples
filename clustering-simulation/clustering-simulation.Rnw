@@ -1,0 +1,225 @@
+% The document will be printed one side in A4 paper.
+\documentclass[12pt,a4paper,twoside]{article}
+
+\usepackage[round]{natbib}
+
+% Packages
+% Use Charter font.
+%\usepackage{charter}
+% for line spacing
+\usepackage{setspace}
+% Use PDF output.
+\usepackage[pdftex]{color,graphicx}
+% The output should be wide.
+\usepackage{a4wide}
+%\usepackage{graphicx}
+\usepackage{url}
+%for definition list
+\usepackage{enumitem}
+%for celsius
+\usepackage{gensymb}
+%for listing code
+\usepackage{listings}
+%
+\usepackage{caption}
+\usepackage{subcaption}
+%
+\usepackage{slashbox}
+
+\usepackage{amsmath}
+%puts silly zeroes in section names
+%\usepackage{fancyhdr}
+%for code snippets
+%\usepackage{float}
+%\floatstyle{ruled}
+%\newfloat{program}{thp}{lop}
+%\floatname{program}{Code snippet}
+
+\usepackage{Sweave}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,calc,through,backgrounds,decorations.pathmorphing,shadows} 
+
+%\usepackage[active,tightpage]{preview}
+
+\usepackage[french, greek, english]{babel}
+%input encoding
+%\usepackage[iso-8859-7]{inputenc}
+%\usepackage[latin1]{inputenc}
+%output encoding
+\usepackage[T1]{fontenc}
+\selectlanguage{english}
+
+% Pour la dedicace
+\usepackage{frcursive}
+
+%\usepackage[table]{xcolor}
+%\usepackage{booktabs}
+%\usepackage{tabu}
+
+\usepackage{url} %tablerules
+\usepackage{xr}
+
+\usepackage[labelfont=bf,labelsep=period,justification=raggedright]{caption}
+\usepackage{authblk}
+
+
+%
+%\SweaveOpts{keep.source=TRUE,pdf=TRUE,eps=FALSE} 
+%\newcommand{\scscst}{\scriptscriptstyle}
+%\newcommand{\scst}{\scriptstyle}
+%\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+%\newcommand{\Rcode}[1]{{\texttt{#1}}}
+%\newcommand{\Robject}[1]{{\texttt{#1}}}
+%\newcommand{\Rpackage}[1]{{\textsf{#1}}}
+%\newcommand{\Rdata}[1]{{\textsf{#1}}}
+%\newcommand{\Rclass}[1]{{\textit{#1}}} 
+%\usepackage[text={7.5in,9in},centering]{geometry}
+%\usepackage{Sweave}
+%\setkeys{Gin}{width=0.95\textwidth}
+%\usepackage[round]{natbib}
+%
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{hyperref} 
+\usepackage{amsmath}
+
+
+% \usepackage{setspace}
+% \setlength{\parindent}{0in}
+
+%\setcounter{secnumdepth}{0}
+
+%\doublespacing
+
+% The document begins here.
+\begin{document}
+%\SweaveOpts{concordance=TRUE}
+
+\begin{figure}
+\begin{center}
+<<label=data,fig=TRUE,echo=FALSE>>=
+
+library(mvtnorm)
+set.seed(1234)
+n <- 2000
+l <- list(
+          list(tau=.2, mu=c(0,0), sigma=diag(2)),
+          list(tau=.2, mu=c(1,1), sigma=diag(2)),
+          list(tau=.2, mu=c(0,2), sigma=diag(2)),
+          list(tau=.2, mu=c(2,0), sigma=diag(2)),
+          list(tau=.2, mu=c(2,2), sigma=diag(2))
+          )
+d <- as.matrix( cbind(rmvnorm(n*l[[1]]$tau, mean=l[[1]]$mu, sigma=l[[1]]$sigma), 1) )
+for (i in 2:length(l)) d <- rbind(d, cbind(rmvnorm(n*l[[i]]$tau, mean=l[[i]]$mu, sigma=l[[i]]$sigma), i))
+d <- data.frame(x=d[,1], y=d[,2], label=factor(d[,3]))
+library(ggplot2)
+library(devtools)
+library(digest)
+source_url("https://raw.github.com/low-decarie/FAAV/master/r/stat-ellipse.R")  
+ggplot(d,aes(x=x,y=y,colour=label,fill=label)) + geom_point() + stat_ellipse()
+#geom_density2d()
+#sum(log(rowSums(sapply(l, function(x) x$tau * dmvnorm(d[,1:2], mean=x$mu, sigma=x$sigma)))))
+l2 <- list(
+          list(tau=.1, mu=c(0,0), sigma=diag(2)),
+          list(tau=.2, mu=c(1,1), sigma=diag(2)),
+          list(tau=.2, mu=c(0,2), sigma=diag(2)),
+          list(tau=.2, mu=c(2,0), sigma=diag(2)),
+          list(tau=.3, mu=c(2,2), sigma=diag(2))
+          )
+#sum(log(rowSums(sapply(l2, function(x) x$tau * dmvnorm(d[,1:2], mean=x$mu, sigma=x$sigma)))))
+#plot(d, pch=20)
+sum( do.call('rbind',by(d[,1:2], d[,3], function(x) as.list(sum(dist(x))))) )
+@ 
+\end{center}
+\caption{ Simulated data of size \Sexpr{dim(d)[[1]]}  }
+\label{fig:data}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+<<label=kmeans,fig=TRUE,echo=FALSE>>=
+res <- kmeans(d[,1:2], centers=5)
+d2 <- d
+d2$label <- factor(res$cluster)
+ggplot(d2,aes(x=x,y=y,colour=label,fill=label)) + geom_point() + stat_ellipse()
+#sum(log(rowSums(mapply(function(mu, x) x$tau * dmvnorm(d[,1:2], mean=mu, sigma=x$sigma),as.list(as.data.frame(t(res$centers))), l ))))
+#plot(d, pch=20)
+sum( do.call('rbind',by(d2[,1:2], d2[,3], function(x) as.list(sum(dist(x))))) )
+@ 
+\end{center}
+\caption{ kmeans with $K=5$ }
+\label{fig:kmeans}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+<<label=pam,fig=TRUE,echo=FALSE>>=
+library(cluster)
+res <- pam(d[,1:2], k=5)
+d2 <- d
+d2$label <- factor(res$clustering)
+ggplot(d2,aes(x=x,y=y,colour=label,fill=label)) + geom_point() + stat_ellipse()
+#sum(log(rowSums(mapply(function(mu, x) x$tau * dmvnorm(d[,1:2], mean=mu, sigma=x$sigma),as.list(as.data.frame(t(res$medoids))), l ))))
+#plot(d, pch=20)
+sum( do.call('rbind',by(d2[,1:2], d2[,3], function(x) as.list(sum(dist(x))))) )
+@ 
+\end{center}
+\caption{ pam with $K=5$ }
+\label{fig:kmeans}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+<<label=flowClust,fig=TRUE,echo=FALSE>>=
+library(flowClust)
+res <- flowClust(d[,1:2], K=5, level=1, B=1000)
+d2 <- d
+d2$label <- factor(Map(res))
+ggplot(d2,aes(x=x,y=y,colour=label,fill=label)) + geom_point() + stat_ellipse()
+#sum(log(rowSums(mapply(function(mu, x) x$tau * dmvnorm(d[,1:2], mean=mu, sigma=x$sigma),as.list(as.data.frame(t(res@mu))), l ))))
+sum( do.call('rbind',by(d2[,1:2], d2[,3], function(x) as.list(sum(dist(x))))) )
+@ 
+\end{center}
+\caption{ flowClust with $K=5$ }
+\label{fig:flowClust}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+<<label=hclust-ward,fig=TRUE,echo=FALSE>>=
+res <- hclust(dist(d[,1:2]), method='ward')
+d2 <- d
+d2$label <- factor(cutree(res, k=5))
+ggplot(d2,aes(x=x,y=y,colour=label,fill=label)) + geom_point() + stat_ellipse()
+#sum(log(rowSums(mapply(function(mu, x) x$tau * dmvnorm(d[,1:2], mean=mu, sigma=x$sigma),as.list(as.data.frame(t(res@mu))), l ))))
+sum( do.call('rbind',by(d2[,1:2], d2[,3], function(x) as.list(sum(dist(x))))) )
+@ 
+\end{center}
+\caption{ hclust ward with $K=5$ }
+\label{fig:hclust-ward}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+<<label=hclust-complete,fig=TRUE,echo=FALSE>>=
+res <- hclust(dist(d[,1:2]), method='ward')
+d2 <- d
+d2$label <- factor(cutree(res, k=5))
+ggplot(d2,aes(x=x,y=y,colour=label,fill=label)) + geom_point() + stat_ellipse()
+#sum(log(rowSums(mapply(function(mu, x) x$tau * dmvnorm(d[,1:2], mean=mu, sigma=x$sigma),as.list(as.data.frame(t(res@mu))), l ))))
+sum( do.call('rbind',by(d2[,1:2], d2[,3], function(x) as.list(sum(dist(x))))) )
+@ 
+\end{center}
+\caption{ hclust complete with $K=5$ }
+\label{fig:hclust-complete}
+\end{figure}
+
+
+
+
+\end{document}
+

@@ -1,0 +1,184 @@
+% The document will be printed one side in A4 paper.
+\documentclass[12pt,a4paper,twoside]{article}
+
+\usepackage[round]{natbib}
+
+% Packages
+% Use Charter font.
+%\usepackage{charter}
+% for line spacing
+\usepackage{setspace}
+% Use PDF output.
+\usepackage[pdftex]{color,graphicx}
+% The output should be wide.
+\usepackage{a4wide}
+%\usepackage{graphicx}
+\usepackage{url}
+%for definition list
+\usepackage{enumitem}
+%for celsius
+\usepackage{gensymb}
+%for listing code
+\usepackage{listings}
+%
+\usepackage{caption}
+\usepackage{subcaption}
+%
+\usepackage{slashbox}
+
+\usepackage{amsmath}
+%puts silly zeroes in section names
+%\usepackage{fancyhdr}
+%for code snippets
+%\usepackage{float}
+%\floatstyle{ruled}
+%\newfloat{program}{thp}{lop}
+%\floatname{program}{Code snippet}
+
+\usepackage{Sweave}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,calc,through,backgrounds,decorations.pathmorphing,shadows} 
+
+%\usepackage[active,tightpage]{preview}
+
+\usepackage[french, greek, english]{babel}
+%input encoding
+%\usepackage[iso-8859-7]{inputenc}
+%\usepackage[latin1]{inputenc}
+%output encoding
+\usepackage[T1]{fontenc}
+\selectlanguage{english}
+
+% Pour la dedicace
+\usepackage{frcursive}
+
+%\usepackage[table]{xcolor}
+%\usepackage{booktabs}
+%\usepackage{tabu}
+
+\usepackage{url} %tablerules
+\usepackage{xr}
+
+\usepackage[labelfont=bf,labelsep=period,justification=raggedright]{caption}
+\usepackage{authblk}
+
+
+%
+%\SweaveOpts{keep.source=TRUE,pdf=TRUE,eps=FALSE} 
+%\newcommand{\scscst}{\scriptscriptstyle}
+%\newcommand{\scst}{\scriptstyle}
+%\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+%\newcommand{\Rcode}[1]{{\texttt{#1}}}
+%\newcommand{\Robject}[1]{{\texttt{#1}}}
+%\newcommand{\Rpackage}[1]{{\textsf{#1}}}
+%\newcommand{\Rdata}[1]{{\textsf{#1}}}
+%\newcommand{\Rclass}[1]{{\textit{#1}}} 
+%\usepackage[text={7.5in,9in},centering]{geometry}
+%\usepackage{Sweave}
+%\setkeys{Gin}{width=0.95\textwidth}
+%\usepackage[round]{natbib}
+%
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{hyperref} 
+\usepackage{amsmath}
+
+
+% \usepackage{setspace}
+% \setlength{\parindent}{0in}
+
+%\setcounter{secnumdepth}{0}
+
+%\doublespacing
+
+% The document begins here.
+\begin{document}
+%\SweaveOpts{concordance=TRUE}
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+\begin{Soutput}
+[1] 704967.8
+\end{Soutput}
+\end{Schunk}
+\includegraphics{clustering-simulation-data}
+\end{center}
+\caption{ Simulated data of size 2000  }
+\label{fig:data}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+\begin{Soutput}
+[1] 532144.4
+\end{Soutput}
+\end{Schunk}
+\includegraphics{clustering-simulation-kmeans}
+\end{center}
+\caption{ kmeans with $K=5$ }
+\label{fig:kmeans}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+\begin{Soutput}
+[1] 503455.4
+\end{Soutput}
+\end{Schunk}
+\includegraphics{clustering-simulation-pam}
+\end{center}
+\caption{ pam with $K=5$ }
+\label{fig:kmeans}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+\begin{Soutput}
+[1] 605137
+\end{Soutput}
+\end{Schunk}
+\includegraphics{clustering-simulation-flowClust}
+\end{center}
+\caption{ flowClust with $K=5$ }
+\label{fig:flowClust}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+\begin{Soutput}
+[1] 579305.9
+\end{Soutput}
+\end{Schunk}
+\includegraphics{clustering-simulation-hclust-ward}
+\end{center}
+\caption{ hclust ward with $K=5$ }
+\label{fig:hclust-ward}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+\begin{Soutput}
+[1] 579305.9
+\end{Soutput}
+\end{Schunk}
+\includegraphics{clustering-simulation-hclust-complete}
+\end{center}
+\caption{ hclust complete with $K=5$ }
+\label{fig:hclust-complete}
+\end{figure}
+
+
+
+
+\end{document}
+
