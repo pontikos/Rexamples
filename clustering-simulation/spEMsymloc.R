@@ -20,7 +20,7 @@ KDEsymloc <-  function(n, m, mu, x, h, z) {
           tmp1=(x[a]-mu[b])-(x[i]-mu[j])
           tmp2=(mu[b]-x[a])-(x[i]-mu[j])
           # Use normal kernel
-          sum <- sum + z[i,j] * mean(exp(-.5*tmp1**2/h**2),exp(-.5*tmp2**2/h**2))
+          sum <- sum + z[i,j] * mean(c(exp(-.5*tmp1**2/h**2),exp(-.5*tmp2**2/h**2)))
         }
       }
       #(a,b) entry of f matrix
