@@ -31,7 +31,7 @@ cat('alpha', alpha, '\n')
 cat('apha.std.err', alpha.std.err, '\n')
 
 #Residual standard error: 1.082 on 98 degrees of freedom
-cat('Residual standard error:', rse <- sqrt(sum((y.obs-y.exp)**2)/98), 'on', dof, '\n')
+cat('Residual standard error:', rse <- sqrt(sum((y.obs-y.exp)**2)/dof), 'on', dof, '\n')
 
 #multiple R^2
 multiple.rsquared <- cov(y.obs,y.exp)/cov(y.obs,y.obs)
