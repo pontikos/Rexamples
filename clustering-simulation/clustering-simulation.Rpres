@@ -1,0 +1,100 @@
+```{r setup, include=FALSE}
+opts_chunk$set(cache=TRUE)
+```
+
+```{r echo=FALSE}
+library(mvtnorm)
+library(ggplot2)
+library(devtools)
+library(digest)
+```
+
+```{r echo=FALSE}
+set.seed(1234)
+n <- 2000
+l <- list(
+          list(tau=.2, mu=c(0,0), sigma=diag(2)),
+          list(tau=.2, mu=c(1,1), sigma=diag(2)),
+          list(tau=.2, mu=c(0,2), sigma=diag(2)),
+          list(tau=.2, mu=c(2,0), sigma=diag(2)),
+          list(tau=.2, mu=c(2,2), sigma=diag(2))
+          )
+d <- as.matrix( cbind(rmvnorm(n*l[[1]]$tau, mean=l[[1]]$mu, sigma=l[[1]]$sigma), 1) )
+for (i in 2:length(l)) d <- rbind(d, cbind(rmvnorm(n*l[[i]]$tau, mean=l[[i]]$mu, sigma=l[[i]]$sigma), i))
+d <- data.frame(x=d[,1], y=d[,2], label=factor(d[,3]))
+```
+
+A comparison of various clustering methods using simulated data
+========================================================
+author: Nikolas Pontikos
+date: 2013
+
+Simulated data of size `r dim(d)[[1]] `
+========================================================
+
+```{r echo=FALSE}
+
+source_url("https://raw.github.com/low-decarie/FAAV/master/r/stat-ellipse.R")  
+ggplot(d,aes(x=x,y=y,colour=label,fill=label)) + geom_point() + stat_ellipse()
+```
+Intracluster distance: `r sum( do.call('rbind',by(d[,1:2], d[,3], function(x) as.list(sum(dist(x))))) ) `.
+
+
+Kmeans with k=5
+========================================================
+
+```{r echo=FALSE}
+res <- kmeans(d[,1:2], centers=5)
+d2 <- d
+d2$label <- factor(res$cluster)
+ggplot(d2,aes(x=x,y=y,colour=label,fill=label)) + geom_point() + stat_ellipse()
+#sum(log(rowSums(mapply(function(mu, x) x$tau * dmvnorm(d[,1:2], mean=mu, sigma=x$sigma),as.list(as.data.frame(t(res$centers))), l ))))
+#plot(d, pch=20)
+sum( do.call('rbind',by(d2[,1:2], d2[,3], function(x) as.list(sum(dist(x))))) )
+```
+
+
+Kmedoids with k=5
+========================================================
+
+```{r echo=FALSE}
+library(cluster)
+res <- pam(d[,1:2], k=5)
+d2 <- d
+d2$label <- factor(res$clustering)
+ggplot(d2,aes(x=x,y=y,colour=label,fill=label)) + geom_point() + stat_ellipse()
+#sum(log(rowSums(mapply(function(mu, x) x$tau * dmvnorm(d[,1:2], mean=mu, sigma=x$sigma),as.list(as.data.frame(t(res$medoids))), l ))))
+#plot(d, pch=20)
+sum( do.call('rbind',by(d2[,1:2], d2[,3], function(x) as.list(sum(dist(x))))) )
+```
+
+
+flowClust with k=5
+========================================================
+```{r echo=FALSE}
+library(flowClust)
+res <- flowClust(d[,1:2], K=5, level=1, B=1000)
+d2 <- d
+d2$label <- factor(Map(res))
+ggplot(d2,aes(x=x,y=y,colour=label,fill=label)) + geom_point() + stat_ellipse()
+#sum(log(rowSums(mapply(function(mu, x) x$tau * dmvnorm(d[,1:2], mean=mu, sigma=x$sigma),as.list(as.data.frame(t(res@mu))), l ))))
+sum( do.call('rbind',by(d2[,1:2], d2[,3], function(x) as.list(sum(dist(x))))) )
+```
+
+
+hclust with method Ward
+========================================================
+```{r echo=FALSE}
+res <- hclust(dist(d[,1:2]), method='ward')
+d2 <- d
+d2$label <- factor(cutree(res, k=5))
+ggplot(d2,aes(x=x,y=y,colour=label,fill=label)) + geom_point() + stat_ellipse()
+#sum(log(rowSums(mapply(function(mu, x) x$tau * dmvnorm(d[,1:2], mean=mu, sigma=x$sigma),as.list(as.data.frame(t(res@mu))), l ))))
+sum( do.call('rbind',by(d2[,1:2], d2[,3], function(x) as.list(sum(dist(x))))) )
+```
+
+
+
+
+
+
